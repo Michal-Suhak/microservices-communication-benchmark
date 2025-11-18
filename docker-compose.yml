@@ -1,0 +1,6 @@
+include:
+  - protocols/rest/docker-compose.yml
+  # - protocols/jsonrpc/docker-compose.yml
+  # - protocols/grpc/docker-compose.yml
+  # - protocols/kafka/docker-compose.yml
+  # - protocols/rabbitmq/docker-compose.yml

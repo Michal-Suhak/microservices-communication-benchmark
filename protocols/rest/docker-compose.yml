@@ -1,0 +1,49 @@
+services:
+  rest-order:
+    build:
+      context: ../..
+      dockerfile: protocols/rest/Dockerfile
+    ports:
+      - "8001:8001"
+    env_file:
+      - ../../.env.docker
+    command: ["python", "-m", "uvicorn", "protocols.rest.order_service:app", "--host", "0.0.0.0", "--port", "8001"]
+    depends_on:
+      - rest-payment
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  rest-payment:
+    build:
+      context: ../..
+      dockerfile: protocols/rest/Dockerfile
+    ports:
+      - "8002:8002"
+    env_file:
+      - ../../.env.docker
+    command: ["python", "-m", "uvicorn", "protocols.rest.payment_service:app", "--host", "0.0.0.0", "--port", "8002"]
+    depends_on:
+      - rest-notification
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  rest-notification:
+    build:
+      context: ../..
+      dockerfile: protocols/rest/Dockerfile
+    ports:
+      - "8003:8003"
+    env_file:
+      - ../../.env.docker
+    command: ["python", "-m", "uvicorn", "protocols.rest.notification_service:app", "--host", "0.0.0.0", "--port", "8003"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
