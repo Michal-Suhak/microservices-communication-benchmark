@@ -12,6 +12,10 @@ dependencies = [
     "httpx>=0.28.0",
     "prometheus-client>=0.21.0",
     "pytest>=9.0.1",
+    "aiohttp>=3.13.2",
+    "jsonrpcclient>=4.0.3",
+    "jsonrpcserver>=5.0.9",
+    "gunicorn>=23.0.0",
 ]
 
 [project.optional-dependencies]

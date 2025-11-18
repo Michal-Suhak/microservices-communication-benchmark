@@ -1,0 +1,67 @@
+services:
+  jsonrpc-order:
+    build:
+      context: ../..
+      dockerfile: protocols/jsonrpc/Dockerfile
+    ports:
+      - "8011:8011"
+    env_file:
+      - ../../.env.docker
+    # Use gunicorn with aiohttp workers for production parity with uvicorn (4 workers)
+    command: [
+      "gunicorn", "protocols.jsonrpc.order_service:create_app()",
+      "--worker-class", "aiohttp.GunicornWebWorker",
+      "--workers", "4",
+      "--bind", "0.0.0.0:8011"
+    ]
+    depends_on:
+      - jsonrpc-payment
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8011/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  jsonrpc-payment:
+    build:
+      context: ../..
+      dockerfile: protocols/jsonrpc/Dockerfile
+    ports:
+      - "8012:8012"
+    env_file:
+      - ../../.env.docker
+    # Use gunicorn with aiohttp workers for production parity with uvicorn (4 workers)
+    command: [
+      "gunicorn", "protocols.jsonrpc.payment_service:create_app()",
+      "--worker-class", "aiohttp.GunicornWebWorker",
+      "--workers", "4",
+      "--bind", "0.0.0.0:8012"
+    ]
+    depends_on:
+      - jsonrpc-notification
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8012/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  jsonrpc-notification:
+    build:
+      context: ../..
+      dockerfile: protocols/jsonrpc/Dockerfile
+    ports:
+      - "8013:8013"
+    env_file:
+      - ../../.env.docker
+    # Use gunicorn with aiohttp workers for production parity with uvicorn (4 workers)
+    command: [
+      "gunicorn", "protocols.jsonrpc.notification_service:create_app()",
+      "--worker-class", "aiohttp.GunicornWebWorker",
+      "--workers", "4",
+      "--bind", "0.0.0.0:8013"
+    ]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8013/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
