@@ -3,6 +3,7 @@ services:
     build:
       context: ../..
       dockerfile: protocols/jsonrpc/Dockerfile
+    container_name: jsonrpc-order
     ports:
       - "8011:8011"
     env_file:
@@ -16,6 +17,11 @@ services:
     ]
     depends_on:
       - jsonrpc-payment
+    networks:
+      - benchmark-network
+    labels:
+      - "com.benchmark.service=order"
+      - "com.benchmark.protocol=jsonrpc"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8011/health"]
       interval: 30s
@@ -26,6 +32,7 @@ services:
     build:
       context: ../..
       dockerfile: protocols/jsonrpc/Dockerfile
+    container_name: jsonrpc-payment
     ports:
       - "8012:8012"
     env_file:
@@ -39,6 +46,11 @@ services:
     ]
     depends_on:
       - jsonrpc-notification
+    networks:
+      - benchmark-network
+    labels:
+      - "com.benchmark.service=payment"
+      - "com.benchmark.protocol=jsonrpc"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8012/health"]
       interval: 30s
@@ -49,6 +61,7 @@ services:
     build:
       context: ../..
       dockerfile: protocols/jsonrpc/Dockerfile
+    container_name: jsonrpc-notification
     ports:
       - "8013:8013"
     env_file:
@@ -60,6 +73,11 @@ services:
       "--workers", "4",
       "--bind", "0.0.0.0:8013"
     ]
+    networks:
+      - benchmark-network
+    labels:
+      - "com.benchmark.service=notification"
+      - "com.benchmark.protocol=jsonrpc"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8013/health"]
       interval: 30s

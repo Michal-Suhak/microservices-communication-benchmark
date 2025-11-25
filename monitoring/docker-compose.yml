@@ -1,0 +1,71 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - benchmark-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+      - GF_INSTALL_PLUGINS=
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      - benchmark-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    command:
+      - '--collector.textfile.directory=/textfile'
+      - '--collector.disable-defaults'
+      - '--collector.textfile'
+    volumes:
+      - /tmp:/textfile:ro
+    networks:
+      - benchmark-network
+    restart: unless-stopped
+
+  docker-stats-exporter:
+    image: alpine:latest
+    container_name: docker-stats-exporter
+    working_dir: /app
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker-stats-exporter.sh:/app/exporter.sh:ro
+      - /tmp:/tmp
+    command: sh -c "apk add --no-cache docker-cli && while true; do sh /app/exporter.sh; sleep 5; done"
+    networks:
+      - benchmark-network
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+  grafana-data:

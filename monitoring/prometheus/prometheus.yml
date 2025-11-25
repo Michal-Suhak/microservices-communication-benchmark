@@ -1,0 +1,53 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+  scrape_timeout: 3s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: 'rest-services'
+    static_configs:
+      - targets:
+          - 'rest-order:8001'
+          - 'rest-payment:8002'
+          - 'rest-notification:8003'
+    metrics_path: '/metrics'
+
+  - job_name: 'jsonrpc-services'
+    static_configs:
+      - targets:
+          - 'jsonrpc-order:8011'
+          - 'jsonrpc-payment:8012'
+          - 'jsonrpc-notification:8013'
+    metrics_path: '/metrics'
+
+  - job_name: 'grpc-services'
+    static_configs:
+      - targets:
+          - 'grpc-order:9091'
+          - 'grpc-payment:9092'
+          - 'grpc-notification:9093'
+    metrics_path: '/metrics'
+
+  - job_name: 'kafka-services'
+    static_configs:
+      - targets:
+          - 'kafka-order:8031'
+          - 'kafka-payment:8032'
+          - 'kafka-notification:8033'
+    metrics_path: '/metrics'
+
+  - job_name: 'rabbitmq-services'
+    static_configs:
+      - targets:
+          - 'rabbitmq-order:8041'
+          - 'rabbitmq-payment:8042'
+          - 'rabbitmq-notification:8043'
+    metrics_path: '/metrics'

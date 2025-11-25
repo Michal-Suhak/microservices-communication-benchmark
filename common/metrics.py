@@ -1,4 +1,4 @@
-from prometheus_client import Counter, Histogram
+from prometheus_client import Counter, Gauge, Histogram, Info
 
 # Request counter
 REQUEST_COUNT = Counter(
@@ -20,7 +20,7 @@ PAYLOAD_SIZE = Histogram(
     "payload_size_bytes",
     "Payload size in bytes",
     ["protocol", "service", "direction"],
-    buckets=(64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768),
+    buckets=(100, 500, 1000, 5000, 10000, 50000, 100000, 500000),
 )
 
 # Error counter
@@ -29,3 +29,13 @@ ERROR_COUNT = Counter(
     "Total number of errors",
     ["protocol", "service", "error_type"],
 )
+
+# Active connections gauge
+ACTIVE_CONNECTIONS = Gauge(
+    "active_connections",
+    "Number of active connections",
+    ["protocol", "service"],
+)
+
+# Service info
+SERVICE_INFO = Info("service_info", "Service information")
