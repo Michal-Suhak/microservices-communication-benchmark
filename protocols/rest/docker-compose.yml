@@ -1,3 +1,7 @@
+x-resource-limits: &resource-limits
+  mem_limit: ${CONTAINER_MEM_LIMIT:-512m}
+  cpus: ${CONTAINER_CPU_LIMIT:-1.0}
+
 services:
   rest-order:
     build:
@@ -21,6 +25,7 @@ services:
       interval: 30s
       timeout: 3s
       retries: 3
+    <<: *resource-limits
 
   rest-payment:
     build:
@@ -44,6 +49,7 @@ services:
       interval: 30s
       timeout: 3s
       retries: 3
+    <<: *resource-limits
 
   rest-notification:
     build:
@@ -65,3 +71,4 @@ services:
       interval: 30s
       timeout: 3s
       retries: 3
+    <<: *resource-limits
