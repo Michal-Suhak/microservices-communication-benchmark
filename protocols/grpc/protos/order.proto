@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package order;
+
+import "common.proto";
+
+message CreateOrderRequest {
+  string customer_id = 1;
+  repeated common.OrderItem items = 2;
+  string shipping_address = 3;
+}
+
+message CreateOrderResponse {
+  bool success = 1;
+  common.Order order = 2;
+  common.Payment payment = 3;
+  common.Notification notification = 4;
+  double total_processing_time_ms = 5;
+}
+
+service OrderService {
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+}

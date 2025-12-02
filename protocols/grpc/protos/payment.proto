@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package payment;
+
+import "common.proto";
+
+message ProcessPaymentRequest {
+  string order_id = 1;
+  double amount = 2;
+  string currency = 3;
+  common.PaymentMethod payment_method = 4;
+}
+
+message ProcessPaymentResponse {
+  bool success = 1;
+  common.Payment payment = 2;
+  common.Notification notification = 3;
+  double processing_time_ms = 4;
+}
+
+service PaymentService {
+  rpc ProcessPayment(ProcessPaymentRequest) returns (ProcessPaymentResponse);
+}

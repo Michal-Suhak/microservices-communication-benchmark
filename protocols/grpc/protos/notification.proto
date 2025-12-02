@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package notification;
+
+import "common.proto";
+
+message SendNotificationRequest {
+  string order_id = 1;
+  string payment_id = 2;
+  string recipient = 3;
+  common.NotificationType notification_type = 4;
+}
+
+message SendNotificationResponse {
+  bool success = 1;
+  common.Notification notification = 2;
+  double processing_time_ms = 3;
+}
+
+service NotificationService {
+  rpc SendNotification(SendNotificationRequest) returns (SendNotificationResponse);
+}

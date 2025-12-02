@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package common;
+
+import "google/protobuf/timestamp.proto";
+
+enum OrderStatus {
+  ORDER_STATUS_UNSPECIFIED = 0;
+  PENDING = 1;
+  PROCESSING = 2;
+  PAID = 3;
+  COMPLETED = 4;
+  FAILED = 5;
+}
+
+enum PaymentStatus {
+  PAYMENT_STATUS_UNSPECIFIED = 0;
+  PAYMENT_PENDING = 1;
+  PAYMENT_PROCESSING = 2;
+  PAYMENT_COMPLETED = 3;
+  PAYMENT_FAILED = 4;
+  REFUNDED = 5;
+}
+
+enum PaymentMethod {
+  PAYMENT_METHOD_UNSPECIFIED = 0;
+  CREDIT_CARD = 1;
+  DEBIT_CARD = 2;
+  BANK_TRANSFER = 3;
+  PAYPAL = 4;
+}
+
+enum NotificationType {
+  NOTIFICATION_TYPE_UNSPECIFIED = 0;
+  EMAIL = 1;
+  SMS = 2;
+  PUSH = 3;
+}
+
+enum NotificationStatus {
+  NOTIFICATION_STATUS_UNSPECIFIED = 0;
+  NOTIFICATION_PENDING = 1;
+  SENT = 2;
+  DELIVERED = 3;
+  NOTIFICATION_FAILED = 4;
+}
+
+message OrderItem {
+  string product_id = 1;
+  string product_name = 2;
+  int32 quantity = 3;
+  double unit_price = 4;
+}
+
+message Order {
+  string order_id = 1;
+  string customer_id = 2;
+  repeated OrderItem items = 3;
+  string shipping_address = 4;
+  double total_amount = 5;
+  OrderStatus status = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+message Payment {
+  string payment_id = 1;
+  string order_id = 2;
+  double amount = 3;
+  string currency = 4;
+  PaymentMethod payment_method = 5;
+  PaymentStatus status = 6;
+  string transaction_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp processed_at = 9;
+  string error_message = 10;
+}
+
+message Notification {
+  string notification_id = 1;
+  string order_id = 2;
+  string payment_id = 3;
+  string recipient = 4;
+  NotificationType notification_type = 5;
+  string message = 6;
+  NotificationStatus status = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp sent_at = 9;
+  google.protobuf.Timestamp delivered_at = 10;
+  string error_message = 11;
+}

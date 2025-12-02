@@ -16,6 +16,9 @@ dependencies = [
     "jsonrpcclient>=4.0.3",
     "jsonrpcserver>=5.0.9",
     "gunicorn>=23.0.0",
+    "grpcio>=1.76.0",
+    "grpcio-tools>=1.76.0",
+    "protobuf>=6.33.1",
 ]
 
 [project.optional-dependencies]
@@ -37,6 +40,10 @@ target-version = "py313"
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM"]
 ignore = ["E501"]
+
+# N802: gRPC servicer methods must use PascalCase to match proto definitions
+[tool.ruff.lint.per-file-ignores]
+"protocols/grpc/*_service.py" = ["N802"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["common", "protocols", "benchmark"]

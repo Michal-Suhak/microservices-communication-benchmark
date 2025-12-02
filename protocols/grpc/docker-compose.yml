@@ -1,0 +1,62 @@
+x-resource-limits: &resource-limits
+  mem_limit: ${CONTAINER_MEM_LIMIT:-512m}
+  cpus: ${CONTAINER_CPU_LIMIT:-1.0}
+
+services:
+  grpc-order:
+    build:
+      context: ../..
+      dockerfile: protocols/grpc/Dockerfile
+    container_name: grpc-order
+    ports:
+      - "8021:8021"
+      - "9021:9021"
+    env_file:
+      - ../../.env.docker
+    command: ["python", "protocols/grpc/order_service.py"]
+    depends_on:
+      - grpc-payment
+    networks:
+      - benchmark-network
+    labels:
+      - "com.benchmark.service=order"
+      - "com.benchmark.protocol=grpc"
+    <<: *resource-limits
+
+  grpc-payment:
+    build:
+      context: ../..
+      dockerfile: protocols/grpc/Dockerfile
+    container_name: grpc-payment
+    ports:
+      - "8022:8022"
+      - "9022:9022"
+    env_file:
+      - ../../.env.docker
+    command: ["python", "protocols/grpc/payment_service.py"]
+    depends_on:
+      - grpc-notification
+    networks:
+      - benchmark-network
+    labels:
+      - "com.benchmark.service=payment"
+      - "com.benchmark.protocol=grpc"
+    <<: *resource-limits
+
+  grpc-notification:
+    build:
+      context: ../..
+      dockerfile: protocols/grpc/Dockerfile
+    container_name: grpc-notification
+    ports:
+      - "8023:8023"
+      - "9023:9023"
+    env_file:
+      - ../../.env.docker
+    command: ["python", "protocols/grpc/notification_service.py"]
+    networks:
+      - benchmark-network
+    labels:
+      - "com.benchmark.service=notification"
+      - "com.benchmark.protocol=grpc"
+    <<: *resource-limits
