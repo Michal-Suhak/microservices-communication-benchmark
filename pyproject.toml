@@ -19,6 +19,7 @@ dependencies = [
     "grpcio>=1.76.0",
     "grpcio-tools>=1.76.0",
     "protobuf>=6.33.1",
+    "locust>=2.42.6",
 ]
 
 [project.optional-dependencies]

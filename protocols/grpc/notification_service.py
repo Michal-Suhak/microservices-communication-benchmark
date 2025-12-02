@@ -15,7 +15,7 @@ sys.path.append("protocols/grpc/generated")
 
 from generated import common_pb2, notification_pb2, notification_pb2_grpc
 
-from common.metrics import ERROR_COUNT, REQUEST_COUNT, REQUEST_LATENCY
+from common.metrics import ERROR_COUNT, PAYLOAD_SIZE, REQUEST_COUNT, REQUEST_LATENCY
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +42,10 @@ class NotificationServicer(notification_pb2_grpc.NotificationServiceServicer):
         REQUEST_COUNT.labels(
             protocol="grpc", service="notification", method="send_notification"
         ).inc()
+
+        PAYLOAD_SIZE.labels(
+            protocol="grpc", service="notification", direction="request"
+        ).observe(request.ByteSize())
 
         try:
             notification = common_pb2.Notification(
@@ -71,11 +75,17 @@ class NotificationServicer(notification_pb2_grpc.NotificationServiceServicer):
                 protocol="grpc", service="notification", method="send_notification"
             ).observe(processing_time / 1000)
 
-            return notification_pb2.SendNotificationResponse(
+            response = notification_pb2.SendNotificationResponse(
                 success=True,
                 notification=notification,
                 processing_time_ms=processing_time,
             )
+
+            PAYLOAD_SIZE.labels(
+                protocol="grpc", service="notification", direction="response"
+            ).observe(response.ByteSize())
+
+            return response
 
         except Exception as e:
             ERROR_COUNT.labels(

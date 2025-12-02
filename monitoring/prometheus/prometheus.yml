@@ -31,9 +31,9 @@ scrape_configs:
   - job_name: 'grpc-services'
     static_configs:
       - targets:
-          - 'grpc-order:9091'
-          - 'grpc-payment:9092'
-          - 'grpc-notification:9093'
+          - 'grpc-order:9021'
+          - 'grpc-payment:9022'
+          - 'grpc-notification:9023'
     metrics_path: '/metrics'
 
   - job_name: 'kafka-services'

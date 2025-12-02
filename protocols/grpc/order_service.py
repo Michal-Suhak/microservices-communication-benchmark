@@ -22,7 +22,7 @@ from generated import (
 )
 
 from common.config import settings
-from common.metrics import ERROR_COUNT, REQUEST_COUNT, REQUEST_LATENCY
+from common.metrics import ERROR_COUNT, PAYLOAD_SIZE, REQUEST_COUNT, REQUEST_LATENCY
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +77,10 @@ class OrderServicer(order_pb2_grpc.OrderServiceServicer):
             protocol="grpc", service="order", method="create_order"
         ).inc()
 
+        PAYLOAD_SIZE.labels(
+            protocol="grpc", service="order", direction="request"
+        ).observe(request.ByteSize())
+
         try:
             total_amount = sum(
                 item.quantity * item.unit_price for item in request.items
@@ -121,13 +125,19 @@ class OrderServicer(order_pb2_grpc.OrderServiceServicer):
                 protocol="grpc", service="order", method="create_order"
             ).observe(processing_time / 1000)
 
-            return order_pb2.CreateOrderResponse(
+            response = order_pb2.CreateOrderResponse(
                 success=True,
                 order=order,
                 payment=payment_response.payment,
                 notification=payment_response.notification,
                 total_processing_time_ms=processing_time,
             )
+
+            PAYLOAD_SIZE.labels(
+                protocol="grpc", service="order", direction="response"
+            ).observe(response.ByteSize())
+
+            return response
 
         except grpc.RpcError as e:
             ERROR_COUNT.labels(

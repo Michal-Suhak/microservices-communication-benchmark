@@ -22,7 +22,7 @@ from generated import (
 )
 
 from common.config import settings
-from common.metrics import ERROR_COUNT, REQUEST_COUNT, REQUEST_LATENCY
+from common.metrics import ERROR_COUNT, PAYLOAD_SIZE, REQUEST_COUNT, REQUEST_LATENCY
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +77,10 @@ class PaymentServicer(payment_pb2_grpc.PaymentServiceServicer):
             protocol="grpc", service="payment", method="process_payment"
         ).inc()
 
+        PAYLOAD_SIZE.labels(
+            protocol="grpc", service="payment", direction="request"
+        ).observe(request.ByteSize())
+
         try:
             payment = common_pb2.Payment(
                 payment_id=str(uuid.uuid4()),
@@ -120,7 +124,7 @@ class PaymentServicer(payment_pb2_grpc.PaymentServiceServicer):
                 protocol="grpc", service="payment", method="process_payment"
             ).observe(processing_time / 1000)
 
-            return payment_pb2.ProcessPaymentResponse(
+            response = payment_pb2.ProcessPaymentResponse(
                 success=True,
                 payment=payment,
                 notification=(
@@ -130,6 +134,12 @@ class PaymentServicer(payment_pb2_grpc.PaymentServiceServicer):
                 ),
                 processing_time_ms=processing_time,
             )
+
+            PAYLOAD_SIZE.labels(
+                protocol="grpc", service="payment", direction="response"
+            ).observe(response.ByteSize())
+
+            return response
 
         except Exception as e:
             ERROR_COUNT.labels(
